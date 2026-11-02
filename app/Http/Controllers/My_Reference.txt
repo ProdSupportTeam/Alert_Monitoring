@@ -1,0 +1,162 @@
+🧠 Step 1: Message Templates
+🔴 CRITICAL
+🚨 *CRITICAL ALERT* 🚨
+Service: Flights
+Partner: Cleartrip
+
+❌ Failures are HIGH!
+Total Orders: 50
+Failed Orders: 30
+Failure Rate: 60%
+
+⚠️ Immediate action required!
+Check partner API / wallet / logs NOW.
+🟡 WARNING
+⚠️ *WARNING ALERT*
+Service: Flights
+Partner: Yatra
+
+Some failures detected.
+Total Orders: 40
+Failed Orders: 15
+Failure Rate: 37%
+
+👀 Please monitor closely.
+
+----------------------------------------------------------
+
+Step 1: Configure in .env
+DB_CONNECTION=mysql   # default (alerts DB)
+
+RO_DB_CONNECTION=mysql_ro
+RO_DB_HOST=xxx.xxx.xxx.xxx
+RO_DB_DATABASE=orders_db
+RO_DB_USERNAME=readonly_user
+RO_DB_PASSWORD=*****
+
+------------------------------------------------
+
+Step 2: Update config/database.php
+
+Add new connection:
+
+'mysql_ro' => [
+    'driver' => 'mysql',
+    'host' => env('RO_DB_HOST'),
+    'database' => env('RO_DB_DATABASE'),
+    'username' => env('RO_DB_USERNAME'),
+    'password' => env('RO_DB_PASSWORD'),
+    'charset' => 'utf8mb4',
+    'collation' => 'utf8mb4_unicode_ci',
+],
+
+-----------------------------------
+🚀 Step 3: Use Connections in Code
+✅ Orders → use RO DB
+DB::connection('mysql_ro')->table('orders')
+
+----------------------------------
+
+✅ Alerts → use default DB
+DB::table('alerts_log')
+
+-----------------------------
+
+🔥 Example Fix in Your Code
+BEFORE ❌
+$totalOrders = DB::table('orders')->count();
+
+------------------------------------------------------
+03-Apr-2026 
+
+$config = [
+    'flight' => [
+        'CLEARTRIP' => ['min_orders' => 10, 'min_failures' => 3, 'percent' => 6],
+        'GoIbibo' => ['min_orders' => 12, 'min_failures' => 3, 'percent' => 6.5],
+        'Yatra' => ['min_orders' => 8, 'min_failures' => 2, 'percent' => 7],
+        'EASEMYTRIP' => ['min_orders' => 10, 'min_failures' => 3, 'percent' => 8],
+    ]
+];
+
+
+--------------------------------------------------------------
+
+$config = [
+    'flight' => [
+        'CLEARTRIP' => [
+            'high' => ['min_orders' => 10, 'min_failures' => 3, 'percent' => 6],
+            'low'  => ['min_orders' => 3,  'min_failures' => 1, 'percent' => 5],
+        ],
+        'GoIbibo' => [
+            'high' => ['min_orders' => 12, 'min_failures' => 3, 'percent' => 6.5],
+            'low'  => ['min_orders' => 3,  'min_failures' => 1, 'percent' => 5],
+        ],
+        'Yatra' => [
+            'high' => ['min_orders' => 8, 'min_failures' => 2, 'percent' => 7],
+            'low'  => ['min_orders' => 3, 'min_failures' => 1, 'percent' => 8.5],
+        ],
+        'EASEMYTRIP' => [
+            'high' => ['min_orders' => 10, 'min_failures' => 3, 'percent' => 8],
+            'low'  => ['min_orders' => 3,  'min_failures' => 1, 'percent' => 7],
+        ],
+    ]
+];
+
+
+-------------------------------------------------------
+
+'hotels' => [
+    'Cleartrip' => [
+        'high' => ['min_orders' => 8, 'min_failures' => 2, 'percent' => 2.5],
+        'low'  => ['min_orders' => 3, 'min_failures' => 1, 'percent' => 2],
+    ],
+    'Makemytrip' => [
+        'high' => ['min_orders' => 12, 'min_failures' => 3, 'percent' => 6],
+        'low'  => ['min_orders' => 3,  'min_failures' => 1, 'percent' => 5.5],
+    ],
+    'Yatra' => [
+        'high' => ['min_orders' => 8, 'min_failures' => 2, 'percent' => 11.5],
+        'low'  => ['min_orders' => 3, 'min_failures' => 1, 'percent' => 4],
+    ],
+];
+
+---------------------------------------------------------
+05 Apr 2026
+
+$config['payments'] = [
+
+    'PAYZAPP' => [
+
+        // 🔥 HIGH TRAFFIC (9 AM – 12 AM)
+        'high' => [
+            'min_orders'   => 20,
+            'min_failures' => 5,
+            'percent'      => 35   // from avg 23 → spike zone
+        ],
+
+        // 🌙 LOW TRAFFIC (1 AM – 8 AM)
+        'low'  => [
+            'min_orders'   => 8,
+            'min_failures' => 2,
+            'percent'      => 45   // higher due to volatility (max 58%)
+        ],
+    ],
+
+    'JUSPAY' => [
+
+        // 🔥 HIGH TRAFFIC
+        'high' => [
+            'min_orders'   => 20,
+            'min_failures' => 4,
+            'percent'      => 20   // avg ~10 → 2x = safe alert
+        ],
+
+        // 🌙 LOW TRAFFIC
+        'low'  => [
+            'min_orders'   => 8,
+            'min_failures' => 2,
+            'percent'      => 30   // max 50 → keep buffer
+        ],
+    ],
+
+];

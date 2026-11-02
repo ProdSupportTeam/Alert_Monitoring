@@ -1,0 +1,5 @@
+# Generated business-report PDFs are served directly (WhatsApp fetches by URL),
+# but the directory itself must never be browsable/enumerable.
+# This path is intentionally separate from the /reports/* routes so it does
+# not shadow the Lumen front controller.
+Options -Indexes

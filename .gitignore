@@ -1,0 +1,22 @@
+/vendor
+/.idea
+Homestead.json
+Homestead.yaml
+.env
+.phpunit.result.cache
+# Logs & runtime data
+*.log
+/logs/
+/storage/logs/
+/cache/
+/tmp/
+*.sqlite
+
+# Generated data exports. These hold customer personal data (mobile, email)
+# and must never be committed - DPDP Act 2023, ISO 27001 A.8.12.
+/storage/*.csv
+/storage/app/*.csv
+/storage/app/*.xlsx
+/public/report_files/*.pdf
+/public/report_files/*.csv
+/public/report_files/*.xlsx
